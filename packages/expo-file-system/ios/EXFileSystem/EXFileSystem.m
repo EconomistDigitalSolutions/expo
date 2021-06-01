@@ -821,17 +821,18 @@ UM_EXPORT_METHOD_AS(getTotalDiskCapacityAsync, getTotalDiskCapacityAsyncWithReso
 
 - (NSURLSession *)_createSession:(EXFileSystemSessionType)type delegate:(id<NSURLSessionDelegate>)delegate
 {
-  NSURLSessionConfiguration *sessionConfiguration;
+  NSOperationQueue *queue;
   if (type == EXFileSystemForegroundSession) {
-    sessionConfiguration = [NSURLSessionConfiguration defaultSessionConfiguration];
+    queue = [NSOperationQueue mainQueue];
   } else {
-    sessionConfiguration = [NSURLSessionConfiguration backgroundSessionConfigurationWithIdentifier:[[NSUUID UUID] UUIDString]];
+    queue = nil;
   }
+  NSURLSessionConfiguration *sessionConfiguration = [NSURLSessionConfiguration backgroundSessionConfigurationWithIdentifier:[[NSUUID UUID] UUIDString]];
   sessionConfiguration.requestCachePolicy = NSURLRequestReloadIgnoringLocalCacheData;
   sessionConfiguration.URLCache = nil;
   return [NSURLSession sessionWithConfiguration:sessionConfiguration
                                        delegate:delegate
-                                  delegateQueue:nil];
+                                  delegateQueue:queue];
 }
 
 - (BOOL)_checkIfFileExists:(NSString *)path
